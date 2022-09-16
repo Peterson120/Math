@@ -1,0 +1,6 @@
+[submodule "LinearRegression/mattplotlib-cpp"]
+	path = LinearRegression/mattplotlib-cpp
+	url = https://github.com/lava/matplotlib-cpp
+[submodule "LinearRegression/matplotlib-cpp"]
+	path = LinearRegression/matplotlib-cpp
+	url = https://github.com/lava/matplotlib-cpp
