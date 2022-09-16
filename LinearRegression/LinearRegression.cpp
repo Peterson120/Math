@@ -13,7 +13,13 @@ int main() {
 	std::cin.tie(NULL); std::cout.tie(NULL); fflush(stdout);
 	int x, y; std::unordered_map<int, std::vector<int>> map;
 	std::cout << "Format: x y\nTerminate with \\0\n";
-	while (std::cin >> x >> y) map[x].push_back(y);
+	std::vector<int> scatter_x, scatter_y;
+	while (std::cin >> x >> y) {
+		map[x].push_back(y);
+		scatter_x.push_back(x);
+		scatter_y.push_back(y);
+	}
+	plt::scatter(scatter_x, scatter_y, 10.0, {{"c", "b"}});
 	double avgx = 0, avgy = 0; int numPoints = 0;
 	for (auto it = map.begin(); it != map.end(); ++it) {	// 1.5*IQR and average
 		//std::sort(it->y.begin(), it->y.end());
@@ -27,16 +33,27 @@ int main() {
 	}
 	avgx /= numPoints;
 	avgy /= numPoints;
-	double mTop = 0, mBottom = 0;
+	double m = 0;
 	bool firstPass = 1;
 	for (auto it = map.begin(); it != map.end(); ++it) { // Linear Regression
 		for (int i : it->y) {
 			if (firstPass) {firstPass = 0; continue;}
-			mTop += (it->x-avgx)*(i-avgy);
+			m += (avgy-i)/(avgx-it->x);
 		}
-		mBottom += (it->x-avgx)*(it->x-avgx);
 	}
-	double m = mTop/mBottom, b = avgy - m*avgx;
+	double b = avgy - m*avgx;
 	std::cout << "y = " << m << (b > 0 ? "x + " : b == 0 ? "" : "x - ") << std::abs(b) << '\n';
+	int n = 100;
+	std::vector<double> xs(n), ys(n);
+	for (int i = 0; i < n; i++) {
+		xs[i] = i;
+		ys[i] = m*xs[i]+b;
+	}
+	plt::named_plot("y = " + std::to_string(m) + (b > 0 ? "x + " : b == 0 ? "" : "x - ") + std::to_string(std::abs(b)), xs, ys);
+	plt::ylim(0, 100);
+	plt::xlim(0, 100);
+	plt::grid(1);
+	plt::legend();
+	plt::show();
 	return 0;
 }
