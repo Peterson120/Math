@@ -13,7 +13,7 @@ namespace plt = matplotlibcpp;
 typedef long double ld;
 const char file_name[] = "testdata.txt";
 std::unordered_map<ld, std::vector<ld>> map;
-std::vector<ld> scatter_x, scatter_y;
+std::vector<ld> scatter_x, scatter_y, residual_x, residual_y;
 std::vector<ld> xs, ys;
 bool readData(ld &avgx, ld &avgy) {
 	ld t, i = 0;
@@ -48,7 +48,7 @@ int main() {
 
 	ld avgx = 0, avgy = 0;
 	if (!readData(avgx, avgy)) {std::cout << "Inequivalent # of Points\n"; return 1;}
-	plt::scatter(scatter_x, scatter_y, 10.0, {{"c", "b"}});
+	plt::scatter(scatter_x, scatter_y, 10.0, {{"c", "r"}});
 
 	ld sx = 0, sy = 0, sxy = 0;
 	for (auto it = map.begin(); it != map.end(); it++) { // Linear Regression
@@ -84,5 +84,24 @@ int main() {
 	plt::grid(1);
 	plt::legend();
 	plt::show();
+
+	for (auto it = map.begin(); it != map.end(); it++) { // Linear Regression
+		ld yhat = 0;
+		for (auto &i : map[it->x]) yhat += i;
+		yhat /= map[it->x].size();
+		residual_x.push_back(it->x);
+		residual_y.push_back(yhat - (m * it->x + b));
+	}
+
+	plt::scatter(residual_x, residual_y, 10.0, {{"c", "g"}});
+	plt::show();
+
+	ld x;
+	while (std::cin >> x) {
+		ld yhat = 0;
+		for (auto &i : map[x]) yhat += i;
+		yhat /= map[x].size();
+		std::cout << "y est: " << m * x + b << "\nResidual: " << yhat - (m * x + b) << '\n';
+	}
 	return 0;
 }
